@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+</head>
+<body>
+    <h1>Please login:</h1>
+    {% for message in get_flashed_messages() %}
+    <h2>error:{{ message }} <a href="/login">refresh</a></h2>
+    {% endfor %}
+
+    <form action="/login" method="POST">
+        <label for="customer_name">Name:</label>
+        <input type="text" name="customer_name" required><br />
+        <label for="passwd">Password:</label>
+        <input type="password" name="passwd" required><br />
+        <button>Login</button>
+    </form>
+
+    <div>Don't have an account yet? <a href="/register">Register</a> here.</div>
+    
+</body>
+</html>

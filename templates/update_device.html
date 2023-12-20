@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Device</title>
+    <link rel="stylesheet" href="{{url_for("static",filename="table.css" )}}">
+</head>
+
+<body>
+    <h2>Dear {{user[1]}}, welcome! <a href="/logout">Logout</a></h2>
+
+    <h2>LocationID: {{location[0][0]}}</h2>
+    {% for message in get_flashed_messages() %}
+    <h2>Info:{{ message }}</h2>
+    {% endfor %}
+    <form method="post">
+        Device Type: <select name="device_type" id="device_type">
+            <option value="" selected="selected">Select Device Type</option>
+        </select>
+        <br><br>
+        Model Numbers: <select name="model_num" id="model_num">
+            <option value="" selected="selected">Please select device type first</option>
+        </select>
+        <br><br>
+        <input class="btn" type="submit" name="submit" value="update">
+    </form>
+
+    <script>
+        let devices = {
+            "Refrigerator": ['RF1001', 'RF1004', 'RF2001'],
+            "Air Conditioner": ['AC1002', 'AC1005', 'AC2002'],
+            'Washing Machine': ['WM1003', 'WM2003'],
+            'Heater': ['HT1003', 'HT2004']
+        }
+        window.onload = function () {
+            let device_type_select = document.getElementById("device_type");
+            let model_num_select = document.getElementById("model_num");
+            for (let x in devices) {
+                device_type_select.options[device_type_select.options.length] = new Option(x, x);
+            }
+            device_type_select.onchange = function () {
+                let z = devices[this.value];
+                model_num_select.options.length=0;
+                for (var i = 0; i < z.length; i++) {
+                    {
+                        model_num_select.options[model_num_select.options.length] = new Option(z[i], z[i]);
+                    }
+                }
+            }
+        }
+    </script>
+
+</body>
+
+</html>

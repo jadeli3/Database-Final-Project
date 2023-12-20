@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Charts</title>
+</head>
+
+<body>
+    <a href="/index">return</a>
+    <h2>Dear {{user[1]}}, welcome! <a href="/logout">Logout</a></h2>
+    <h2>Charts</h2>
+    {% for message in get_flashed_messages() %}
+    <h2>Info:{{ message }} <a href="/index">refresh</a></h2>
+    {% endfor %}
+
+    <div style="border:1px solid black;padding:8px;margin-bottom: 20px;">
+        <p>Please choose a date period to view daily energy consumption(for all service locations)</p>
+        <div>
+            Start day: <input type="date" class="start_day">
+            End day: <input type="date" class="end_day">
+            <br />
+            <button class="first_chart_btn">choose</button>
+        </div>
+        <div id="first_" style="width: 900px;height:400px;"></div>
+    </div>
+
+    <div style="border:1px solid black;padding:8px;margin-bottom: 20px;">
+        <p>Please choose a date period to View the energy consumption of different devices.</p>
+        <div>
+            Start day: <input type="date" class="start_date">
+            End day: <input type="date" class="end_date">
+            <br />
+            <button class="second_chart_btn">choose</button>
+        </div>
+        <div id="second_" style="width: 900px;height:400px;"></div>
+    </div>
+
+    <div style="border:1px solid black;padding:8px;margin-bottom: 20px;">
+        <p>Please choose a location to View comparison of the energy consumption of the location you selected with other similar locations.</p>
+        <div>
+            Choose location: <select class="location_chooser">
+                {% for location in locations %}
+                <option value="{{location[0]}}">{{location[2]}}</option>
+                {% endfor %}
+            </select>
+            <br />
+            <button class="third_chart_btn">choose</button>
+        </div>
+        <div id="third_" style="width: 900px;height:400px;"></div>
+    </div>
+
+    <div style="border:1px solid black;padding:8px;margin-bottom: 20px;">
+        <p>Please choose a date period to View the costs of energy consumption of different devices.</p>
+        <div>
+            Start day: <input type="date" class="start_date1">
+            End day: <input type="date" class="end_date1">
+            <br />
+            <button class="four_chart_btn">choose</button>
+        </div>
+        <div id="four_" style="width: 900px;height:400px;"></div>
+    </div>
+
+    <script src="{{url_for('static',filename='echarts.min.js')}}"></script>
+    <script src="{{url_for('static',filename='axios.min.js')}}"></script>
+    <script type="text/javascript">
+
+        let chart1 = echarts.init(document.getElementById('first_'));
+        chart1.setOption(
+            {
+                title: {
+                    text: 'Your daily energy consumption during this period'
+                },
+                xAxis: {
+                    type: 'category',
+                    data: []
+                },
+                yAxis: {
+                    type: 'value'
+                },
+                series: [
+                    {
+                        data: [],
+                        type: 'line'
+                    }
+                ]
+            }
+        )
+
+        const first_chart_btn = document.querySelector('.first_chart_btn');
+        first_chart_btn.addEventListener('click', (e) => {
+            const start_day_ele = document.querySelector(".start_day")
+            const end_day_ele = document.querySelector(".end_day")
+            console.log(start_day_ele.value)
+            console.log(end_day_ele.value)
+            if (start_day_ele.value === '' || end_day_ele.value === '') {
+                alert('please choose date!')
+                return
+            }
+
+            let start_ = new Date(start_day_ele.value);
+            let end_ = new Date(end_day_ele.value);
+            if (start_ > end_) {
+                alert('start day cannot big than end day!')
+                return
+            }
+
+            axios({
+                method: 'post',
+                url: '/energy_consumption',
+                data: {
+                    start_day: start_day_ele.value,
+                    end_day: end_day_ele.value,
+                }
+            }).then(function (response) {
+                // handle success
+                //console.log(response);
+                if (response.data.state === 'success') {
+                    let usagecount = response.data.usagecount;
+                    //console.log(usagecount)
+                    let keys = Object.keys(usagecount);
+                    let values = Object.values(usagecount);
+                    let values_ = [];
+                    for (let item of values) {
+                        values_.push(parseFloat(item))
+                    }
+                    console.log(keys)
+                    console.log(values_)
+                    //refresh the chart
+                    chart1.setOption(
+                        {
+                            xAxis: {
+                                type: 'category',
+                                data: keys
+                            },
+                            yAxis: {
+                                type: 'value'
+                            },
+                            series: [
+                                {
+                                    data: values_,
+                                    type: 'line'
+                                }
+                            ]
+                        }
+                    )
+                }
+            })
+                .catch(function (error) {
+                    // handle error
+                    console.log(error);
+                })
+        })
+
+        let chart2 = echarts.init(document.getElementById('second_'));
+        chart2.setOption(
+            {
+                title: {
+                    text: 'Your energy consumption of different devices during this period'
+                },
+                xAxis: {
+                    type: 'category',
+                    axisLabel: {
+                        interval: 0,
+                        rotate: -20 
+                    },
+                    data: []
+                },
+                yAxis: {
+                    type: 'value'
+                },
+                series: [
+                    {
+                        data: [],
+                        type: 'bar'
+                    }
+                ]
+            }
+        )
+
+        const second_chart_btn = document.querySelector('.second_chart_btn');
+        second_chart_btn.addEventListener('click', (e) => {
+            const start_day_ele = document.querySelector(".start_date")
+            const end_day_ele = document.querySelector(".end_date")
+            console.log(start_day_ele.value)
+            console.log(end_day_ele.value)
+            if (start_day_ele.value === '' || end_day_ele.value === '') {
+                alert('please choose date!')
+                return
+            }
+
+            let start_ = new Date(start_day_ele.value);
+            let end_ = new Date(end_day_ele.value);
+            if (start_ > end_) {
+                alert('start date cannot big than end date!')
+                return
+            }
+
+            axios({
+                method: 'post',
+                url: '/devices_consumption',
+                data: {
+                    start_day: start_day_ele.value,
+                    end_day: end_day_ele.value,
+                }
+            }).then(function (response) {
+                // handle success
+                //console.log(response);
+                if (response.data.state === 'success') {
+                    let usagecount = response.data.usagecount;
+                    //console.log(usagecount)
+                    let keys = Object.keys(usagecount);
+                    let values = Object.values(usagecount);
+                    let values_ = [];
+                    for (let item of values) {
+                        values_.push(parseFloat(item))
+                    }
+                    console.log(keys)
+                    console.log(values_)
+                    //refresh
+                    chart2.setOption(
+                        {
+                            xAxis: {
+                                type: 'category',
+                                data: keys
+                            },
+                            yAxis: {
+                                type: 'value'
+                            },
+                            series: [
+                                {
+                                    data: values_,
+                                    type: 'bar'
+                                }
+                            ]
+                        }
+                    )
+                }
+            })
+                .catch(function (error) {
+                    // handle error
+                    console.log(error);
+                })
+        })
+
+        let chart3 = echarts.init(document.getElementById('third_'));
+        chart3.setOption(
+            {
+                title: {
+                    text: 'Comparison of the energy consumption of the location you selected with other similar locations'
+                },
+                series: [
+                    {
+                        data: [],
+                        type: 'pie'
+                    }
+                ]
+            }
+        )
+
+        const third_chart_btn = document.querySelector('.third_chart_btn');
+        third_chart_btn.addEventListener('click', (e) => {
+            location_select_ele = document.querySelector('.location_chooser');
+
+            if (location_select_ele.value === '') {
+                alert('please choose location!')
+                return
+            }
+
+            axios({
+                method: 'post',
+                url: '/location_compare',
+                data: {
+                    location_id: location_select_ele.value,
+                }
+            }).then(function (response) {
+                // handle success
+                console.log(response);
+                if (response.data.state === 'success') {
+                    let li= response.data.compare_data;
+                    //refresh
+                    chart3.setOption(
+                        {
+                            series: [
+                                {
+                                    data: [
+                                        {
+                                            value: parseFloat(li[0]),
+                                            name: 'You choosed location'
+                                        },
+                                        {
+                                            value: parseFloat(li[1]),
+                                            name: 'Other similar locations'
+                                        },
+                                    ],
+                                    type: 'pie'
+                                }
+                            ]
+                        }
+                    )
+                }
+            })
+                .catch(function (error) {
+                    // handle error
+                    console.log(error);
+                })
+        })
+
+        let chart4 = echarts.init(document.getElementById('four_'));
+        chart4.setOption(
+            {
+                title: {
+                    text: 'Your costs of energy consumption of different devices during this period'
+                },
+                xAxis: {
+                    type: 'category',
+                    axisLabel: {
+                        interval: 0,
+                        rotate: -20 
+                    },
+                    data: []
+                },
+                yAxis: {
+                    type: 'value'
+                },
+                series: [
+                    {
+                        data: [],
+                        type: 'bar'
+                    }
+                ]
+            }
+        )
+
+        const four_chart_btn = document.querySelector('.four_chart_btn');
+        four_chart_btn.addEventListener('click', (e) => {
+            const start_day_ele = document.querySelector(".start_date1")
+            const end_day_ele = document.querySelector(".end_date1")
+            console.log(start_day_ele.value)
+            console.log(end_day_ele.value)
+            if (start_day_ele.value === '' || end_day_ele.value === '') {
+                alert('please choose date!')
+                return
+            }
+
+            let start_ = new Date(start_day_ele.value);
+            let end_ = new Date(end_day_ele.value);
+            if (start_ > end_) {
+                alert('start date cannot big than end date!')
+                return
+            }
+
+            axios({
+                method: 'post',
+                url: '/devices_consumption_cost',
+                data: {
+                    start_day: start_day_ele.value,
+                    end_day: end_day_ele.value,
+                }
+            }).then(function (response) {
+                // handle success
+                //console.log(response);
+                if (response.data.state === 'success') {
+                    let usagecount = response.data.costs
+                    //console.log(usagecount)
+                    let keys = Object.keys(usagecount);
+                    let values = Object.values(usagecount);
+                    let values_ = [];
+                    for (let item of values) {
+                        values_.push(parseFloat(item))
+                    }
+                    console.log(keys)
+                    console.log(values_)
+                    //refresh
+                    chart4.setOption(
+                        {
+                            xAxis: {
+                                type: 'category',
+                                data: keys
+                            },
+                            yAxis: {
+                                type: 'value'
+                            },
+                            series: [
+                                {
+                                    data: values_,
+                                    type: 'bar'
+                                }
+                            ]
+                        }
+                    )
+                }
+            })
+                .catch(function (error) {
+                    // handle error
+                    console.log(error);
+                })
+        })
+
+
+    </script>
+
+</body>
+
+</html>

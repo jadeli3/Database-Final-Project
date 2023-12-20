@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update location</title>
+    <link rel="stylesheet" href="{{url_for("static",filename="table.css" )}}">
+</head>
+
+<body>
+    <h2>Dear {{user[1]}}, welcome! <a href="/logout">Logout</a></h2>
+
+    <h2>Update location</h2>
+    {% for message in get_flashed_messages() %}
+    <h2>error:{{ message }} </h2>
+    {% endfor %}
+
+    <form method="post">
+        Unit And Street Address <input type="text" name="unit_and_street_address" autocomplete="off" value="{{location[2]}}" required>
+        City <input type="text" name="city" autocomplete="off" value="{{location[3]}}" required>
+        State <input type="text" name="state" autocomplete="off" value="{{location[4]}}" required>
+        ZipCode <input type="text" name="zip_code" autocomplete="off" value="{{location[5]}}" required>
+        AcquisitionDate <input type="date" name="acquisitiondate" autocomplete="off" value="{{location[6]}}" required>
+        <br />
+        SquareFootage <input type="text" name="square_footage" autocomplete="off" value="{{location[7]}}" required>
+        NumberOfBedrooms <input type="text" name="number_of_bedrooms" autocomplete="off" value="{{location[8]}}" required>
+        NumberOfOccupants <input type="text" name="number_of_occupants" autocomplete="off"  value="{{location[9]}}" required>
+        <input class="btn" type="submit" name="submit" value="update">
+    </form>
+    
+</body>
+
+</html>

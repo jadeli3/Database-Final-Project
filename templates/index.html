@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <link rel="stylesheet" href="{{url_for("static",filename="table.css" )}}">
+</head>
+
+<body>
+    <h2>Dear {{user[1]}}, welcome! <a href="/logout">Logout</a></h2>
+    <h2><a href="/charts">charts</a></h2>
+
+    <h2>Service Locations</h2>
+    <p>{{ locations|length }} in total</p>
+    {% for message in get_flashed_messages() %}
+    <h2>Info:{{ message }} <a href="/index">refresh</a></h2>
+    {% endfor %}
+    <form method="post">
+        Unit And Street Address <input type="text" name="unit_and_street_address" autocomplete="off" required>
+        City <input type="text" name="city" autocomplete="off" required>
+        State <input type="text" name="state" autocomplete="off" required>
+        ZipCode <input type="text" name="zip_code" autocomplete="off" required>
+        AcquisitionDate <input type="date" name="acquisitiondate" autocomplete="off" required>
+        <br />
+        SquareFootage <input type="text" name="square_footage" autocomplete="off" required>
+        NumberOfBedrooms <input type="text" name="number_of_bedrooms" autocomplete="off" required>
+        NumberOfOccupants <input type="text" name="number_of_occupants" autocomplete="off" required>
+        <input class="btn" type="submit" name="submit" value="add">
+    </form>
+    {% if locations %}
+    <table>
+        <tr>
+            <th>CustomerID</th>
+            <th>Unit And Street Address</th>
+            <th>City</th>
+            <th>State</th>
+            <th>ZipCode</th>
+            <th>AcquisitionDate</th>
+            <th>SquareFootage</th>
+            <th>NumberOfBedrooms</th>
+            <th>NumberOfOccupants</th>
+            <th>Operation</th>
+        </tr>
+        {% for location in locations %}
+        <tr>
+            <td>{{ location[1] }}</td>
+            <td>{{ location[2] }}</td>
+            <td>{{ location[3] }}</td>
+            <td>{{ location[4]}}</td>
+            <td>{{ location[5]}}</td>
+            <td>{{location[6]}}</td>
+            <td>{{location[7]}}</td>
+            <td>{{location[8]}}</td>
+            <td>{{location[9]}}</td>
+            <td>
+                <a href="/del/{{location[0]}}">Delete</a>
+                <a href="/update/{{location[0]}}">update</a>
+                <a href="/device/{{location[0]}}">Device Management</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+    <p>No location found.</p>
+    {% endif %}
+
+</body>
+
+</html>
